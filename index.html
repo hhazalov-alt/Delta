@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delta Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0b0f19;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(17, 24, 39, 0.8);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.15);
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+        }
+
+        .profile-pic {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 3px solid #8b5cf6;
+            object-fit: cover;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #f3f4f6;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: #9ca3af;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            color: #d1d5db;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(31, 41, 55, 0.6);
+            border: 1px solid #374151;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #7c3aed, #4f46e5);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(124, 58, 237, 0.4);
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Dashboard Styles */
+        #dashboard-view {
+            display: none;
+        }
+
+        .user-info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(31, 41, 55, 0.4);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .token-display {
+            color: #f59e0b;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tab-menu {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            background: rgba(31, 41, 55, 0.4);
+            padding: 5px;
+            border-radius: 10px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .file-box {
+            background: rgba(31, 41, 55, 0.5);
+            border: 1px dashed #4b5563;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .file-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 2px solid #8b5cf6;
+        }
+
+        .daily-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .daily-item {
+            background: rgba(31, 41, 55, 0.5);
+            border: 1px solid #374151;
+            border-radius: 8px;
+            padding: 10px 5px;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .daily-item.claimed {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .daily-item span {
+            display: block;
+            font-weight: bold;
+            color: #f59e0b;
+            margin-top: 3px;
+        }
+
+        .wheel-container {
+            text-align: center;
+            padding: 10px;
+        }
+
+        #wheelTitle {
+            cursor: pointer;
+            user-select: none;
+            display: inline-block;
+            padding: 5px 15px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #c084fc;
+        }
+
+        .wheel-result {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- LOGIN / AUTH VIEW -->
+        <div id="auth-view" class="card">
+            <div class="logo-container">
+                <img src="https://i.ibb.co/6y18vC5/delta.jpg" alt="Delta" class="profile-pic" onerror="this.src='https://via.placeholder.com/90/8b5cf6/ffffff?text=Delta'">
+                <h1>DELTA</h1>
+                <div class="subtitle">Güvenli Giriş Paneli</div>
+            </div>
+
+            <div class="input-group">
+                <label>GMAIL ADRESİ</label>
+                <input type="email" id="emailInput" placeholder="ornek@gmail.com">
+            </div>
+
+            <div class="input-group">
+                <label>KEY (Sonsuz Key: Zone)</label>
+                <input type="text" id="keyInput" placeholder="Key giriniz...">
+            </div>
+
+            <button class="btn" onclick="handleLogin()">Giriş Yap</button>
+            <div id="errorMsg" class="error-msg">Geçersiz Key veya Gmail! Doğru key: Zone</div>
+        </div>
+
+        <!-- MAIN DASHBOARD VIEW -->
+        <div id="dashboard-view" class="card">
+            <div class="user-info-bar">
+                <span id="userEmailDisplay" style="color: #9ca3af; overflow: hidden; text-overflow: ellipsis; max-width: 180px;"></span>
+                <div class="token-display">🪙 <span id="tokenCount">0</span> Jeton</div>
+            </div>
+
+            <div class="tab-menu">
+                <button class="tab-btn active" onclick="switchTab('download')">İndir</button>
+                <button class="tab-btn" onclick="switchTab('daily')">Günlük</button>
+                <button class="tab-btn" onclick="switchTab('wheel')">Çark</button>
+            </div>
+
+            <!-- DOWNLOAD TAB -->
+            <div id="tab-download" class="tab-content active">
+                <div class="file-box">
+                    <img src="https://i.ibb.co/6y18vC5/delta.jpg" alt="Delta" class="file-icon" onerror="this.src='https://via.placeholder.com/50/8b5cf6/ffffff?text=D'">
+                    <h3 style="font-size: 16px; margin-bottom: 5px;">Delta-2.729.840.apk</h3>
+                    <p style="font-size: 12px; color: #9ca3af; margin-bottom: 15px;">Maliyet: 10 Jeton</p>
+                    <button class="btn" onclick="handleDownload()">İndir (10 Jeton)</button>
+                </div>
+                <div id="downloadMsg" style="font-size: 12px; margin-top: 5px;"></div>
+            </div>
+
+            <!-- DAILY TAB -->
+            <div id="tab-daily" class="tab-content">
+                <p style="font-size: 13px; color: #9ca3af; margin-bottom: 15px;">Her gün giriş yaparak ödülünü katla!</p>
+                <div class="daily-grid" id="dailyGrid">
+                    <!-- Javascript ile doldurulacak -->
+                </div>
+                <button class="btn" onclick="claimDaily()">Bugünkü Ödülü Al</button>
+                <div id="dailyMsg" style="font-size: 12px; margin-top: 10px;"></div>
+            </div>
+
+            <!-- WHEEL TAB -->
+            <div id="tab-wheel" class="tab-content">
+                <div class="wheel-container">
+                    <!-- Gizli hile tetikleyicisi olan yazı -->
+                    <div id="wheelTitle" onclick="handleWheelClick()">Çark</div>
+                    <p style="font-size: 12px; color: #9ca3af; margin-bottom: 15px;">Çevirme ücreti: 1 Jeton (%30 ihtimalle 3 Jeton kazanırsın)</p>
+                    <button class="btn" onclick="spinWheel()">Çarkı Çevir (1 J.)</button>
+                    <div class="wheel-result" id="wheelResult"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Kullanıcı Verileri
+        let userData = {
+            email: "",
+            tokens: 5, // Başlangıç için ufak bir ikramiye, dilerseniz 0 yapabilirsiniz
+            lastClaimDay: 0,
+            lastClaimDate: "",
+            secretClicks: 0
+        };
+
+        function handleLogin() {
+            const email = document.getElementById('emailInput').value.trim();
+            const key = document.getElementById('keyInput').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (email !== "" && key === "Zone") {
+                userData.email = email;
+                document.getElementById('userEmailDisplay').innerText = email;
+                document.getElementById('auth-view').style.display = 'none';
+                document.getElementById('dashboard-view').style.display = 'block';
+                updateTokens();
+                renderDailyGrid();
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tabName === 'download') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tab-download').classList.add('active');
+            } else if (tabName === 'daily') {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tab-daily').classList.add('active');
+                renderDailyGrid();
+            } else if (tabName === 'wheel') {
+                document.querySelectorAll('.tab-btn')[2].classList.add('active');
+                document.getElementById('tab-wheel').classList.add('active');
+            }
+        }
+
+        function updateTokens() {
+            document.getElementById('tokenCount').innerText = userData.tokens;
+        }
+
+        // İndirme İşlemi
+        function handleDownload() {
+            const msg = document.getElementById('downloadMsg');
+            if (userData.tokens >= 10) {
+                userData.tokens -= 10;
+                updateTokens();
+                msg.style.color = "#10b981";
+                msg.innerText = "İndirme başlatılıyor...";
+                setTimeout(() => {
+                    window.location.href = "https://www.mediafire.com/file/jjrb7tl3exagddq/Delta-2.729.840.apk/file";
+                }, 1000);
+            } else {
+                msg.style.color = "#ef4444";
+                msg.innerText = "Yetersiz jeton! Çark çevirerek veya günlük ödülle jeton kazan.";
+            }
+        }
+
+        // Günlük Ödül Sistemi (1'den 7'ye kadar artan)
+        function renderDailyGrid() {
+            const grid = document.getElementById('dailyGrid');
+            grid.innerHTML = "";
+            
+            const todayStr = new Date().toDateString();
+            const isAlreadyClaimedToday = userData.lastClaimDate === todayStr;
+
+            for (let i = 1; i <= 7; i++) {
+                let isClaimed = i <= userData.lastClaimDay && isAlreadyClaimedToday;
+                grid.innerHTML += `
+                    <div class="daily-item ${isClaimed ? 'claimed' : ''}">
+                        Gün ${i}
+                        <span>+${i} J.</span>
+                    </div>
+                `;
+            }
+        }
+
+        function claimDaily() {
+            const msg = document.getElementById('dailyMsg');
+            const todayStr = new Date().toDateString();
+
+            if (userData.lastClaimDate === todayStr) {
+                msg.style.color = "#ef4444";
+                msg.innerText = "Bugünkü ödülü zaten aldın, yarın tekrar gel!";
+                return;
+            }
+
+            userData.lastClaimDay = (userData.lastClaimDay % 7) + 1;
+            userData.tokens += userData.lastClaimDay;
+            userData.lastClaimDate = todayStr;
+            updateTokens();
+            renderDailyGrid();
+
+            msg.style.color = "#10b981";
+            msg.innerText = `Tebrikler! ${userData.lastClaimDay} jeton kazandın.`;
+        }
+
+        // Çark Sistemi ve Gizli Hile Mekaniği (5 Kez Tıklama)
+        function handleWheelClick() {
+            userData.secretClicks++;
+            if (userData.secretClicks >= 5) {
+                // Hile aktifleştiğini belli etmeden arka planda ayarla
+                userData.secretClicks = 5; 
+            }
+        }
+
+        function spinWheel() {
+            const resultEl = document.getElementById('wheelResult');
+            
+            if (userData.tokens < 1) {
+                resultEl.style.color = "#ef4444";
+                resultEl.innerText = "Yetersiz jeton!";
+                return;
+            }
+
+            userData.tokens -= 1; // 1 jeton düş
+            updateTokens();
+
+            resultEl.style.color = "#9ca3af";
+            resultEl.innerText = "Çark dönüyor...";
+
+            setTimeout(() => {
+                // Eğer gizli "Çark" yazısına tam 5 kez tıklandıysa %100 ihtimalle 10k kazandır
+                if (userData.secretClicks === 5) {
+                    userData.tokens += 10000;
+                    updateTokens();
+                    resultEl.style.color = "#10b981";
+                    resultEl.innerText = "Tebrikler! 10,000 Jeton kazandın! 🎉";
+                    // Tekrar sıfırlanmasın isteniyorsa bırakılabilir veya sıfırlanabilir
+                } else {
+                    // Normal şans: %30 ihtimalle 3 jeton, %70 ihtimalle 0
+                    const randomChance = Math.random();
+                    if (randomChance <= 0.30) {
+                        userData.tokens += 3;
+                        updateTokens();
+                        resultEl.style.color = "#10b981";
+                        resultEl.innerText = "Tebrikler! 3 Jeton kazandın!";
+                    } else {
+                        resultEl.style.color = "#ef4444";
+                        resultEl.innerText = "Kaybettin, şansına küs!";
+                    }
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
